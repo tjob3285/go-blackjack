@@ -26,7 +26,7 @@ func (d *Dealer) DealerDraws(deck *deck.Deck) {
 		card := deck.DealCard()
 		if card != nil {
 			d.AddCard(card)
-			fmt.Printf("%s drew a %s of %s. Score: %d\n", d.Name, card.Rank, card.Suit, d.Score)
+			fmt.Printf("%s drew a %s of %s. Score: %d\n\n", d.Name, card.Rank, card.Suit, d.Score)
 		}
 	}
 }

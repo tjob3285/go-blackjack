@@ -1,19 +1,26 @@
 package player
 
-import "go-blackjack/card"
+import (
+	"go-blackjack/card"
+	"log"
+	"os"
+	"strconv"
+)
 
 type Player struct {
 	Name     string
 	Hand     []*card.Card
 	Score    int
 	IsDealer bool
+	Tokens   int
 }
 
-func NewPlayer(name string, isDealer bool) *Player {
+func NewPlayer(name string, isDealer bool, tokens int) *Player {
 	return &Player{
 		Name:     name,
 		Hand:     []*card.Card{},
 		IsDealer: isDealer,
+		Tokens:   tokens,
 	}
 }
 
@@ -39,4 +46,26 @@ func (p *Player) updateScore() {
 	}
 
 	p.Score = score
+}
+
+func (p *Player) UpdateTokens(betAmount int, outcome bool) error {
+	tokensTxt := "tokens.txt"
+
+	if outcome {
+		p.Tokens += betAmount
+	} else {
+		p.Tokens -= betAmount
+	}
+
+	// Convert new token count to string
+	newTokenStr := strconv.Itoa(p.Tokens)
+
+	// Write the new value to the file
+	err := os.WriteFile(tokensTxt, []byte(newTokenStr), 0644)
+	if err != nil {
+		log.Fatalf("Error writing to file: %v", err)
+		return err
+	}
+
+	return nil
 }

@@ -40,6 +40,8 @@ func getCardValue(rank string) int {
 		return 10
 	case "A":
 		return 11 // Ace can be 11 or 1, but we'll adjust later
+	case "10":
+		return 10
 	default:
 		return int(rank[0] - '0')
 	}
