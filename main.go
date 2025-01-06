@@ -1,17 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"go-blackjack/game"
-	"os"
 	"strconv"
 	"strings"
+
+	"github.com/charmbracelet/huh"
 )
 
 func main() {
-	scanner := bufio.NewScanner(os.Stdin)
-
 	game := game.NewGame("Player 1")
 
 	var input string
@@ -21,27 +19,41 @@ func main() {
 
 		fmt.Printf("\nStarting a new round. You have $%d.\n", game.Player.Tokens)
 		fmt.Printf("You have $%d. Enter your bet:", game.Player.Tokens)
-		scanner.Scan()
-		betInput := strings.TrimSpace(scanner.Text())
-		betAmount, err := strconv.Atoi(betInput)
+
+		if game.Player.Tokens == 0 {
+			fmt.Printf("Insufficient funds! You only have $%d.\n", game.Player.Tokens)
+			return
+		}
+
+		var betInput string
+		huh.NewInput().
+			Title("Enter your bet:").
+			Value(&betInput).
+			Run()
+
+		betAmount, err := strconv.Atoi(strings.TrimSpace(betInput))
 		if err != nil || betAmount <= 0 {
 			fmt.Println("Invalid bet amount. Please enter a valid number greater than 0.")
-			return
+			continue
 		}
 		if betAmount > game.Player.Tokens {
 			fmt.Printf("Insufficient funds! You only have $%d.\n", game.Player.Tokens)
-			return
+			continue
 		}
 
 		game.Start()
 
 		for game.Player.Score < 21 || input == "double" {
 
-			fmt.Println("What would you like to do?")
-			fmt.Println("Type 'hit' to draw a card, 'double' to draw one card for double the bet, 'stand' to hold, or 'quit' to exit the game.")
-
-			scanner.Scan()
-			input = strings.ToLower(scanner.Text())
+			huh.NewSelect[string]().
+				Title("What would you like to do?").
+				Options(
+					huh.NewOption("Hit", "hit"),
+					huh.NewOption("Double", "double"),
+					huh.NewOption("Stand", "stand"),
+				).
+				Value(&input).
+				Run()
 
 			switch input {
 			case "hit":
@@ -70,9 +82,6 @@ func main() {
 				fmt.Printf("Player score %d \n\n", game.Player.Score)
 				game.DetermineWinner(betAmount * 2)
 				goto NextRound
-			case "quit":
-				fmt.Println("Exiting the game...")
-				return
 			default:
 				fmt.Println("Invalid option, please type 'hit', 'stand', or 'quit'.")
 			}
@@ -85,11 +94,19 @@ func main() {
 		}
 
 	NextRound:
-		fmt.Println("Do you want to play another round? (yes/no)")
-		scanner.Scan()
-		playAgain := strings.ToLower(scanner.Text())
+		var playAgain bool
+		if game.Player.Tokens == 0 {
+			playAgain = false
+		} else {
+			huh.NewConfirm().
+				Title("Do you want to play another round?").
+				Affirmative("Yes!").
+				Negative("No.").
+				Value(&playAgain).
+				Run()
+		}
 
-		if playAgain != "yes" {
+		if !playAgain {
 			fmt.Println("Thank you for playing! Exiting the game.")
 			break
 		}
