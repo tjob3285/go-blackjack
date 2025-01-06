@@ -29,6 +29,10 @@ func (p *Player) AddCard(card *card.Card) {
 	p.updateScore()
 }
 
+func (p *Player) ResetHand() {
+	p.Hand = []*card.Card{}
+}
+
 func (p *Player) updateScore() {
 	score := 0
 	aceCount := 0

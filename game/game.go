@@ -74,4 +74,7 @@ func (g *Game) DetermineWinner(betAmount int) {
 	} else {
 		fmt.Println("It's a tie!")
 	}
+
+	g.Player.ResetHand()
+	g.Dealer.ResetHand()
 }
