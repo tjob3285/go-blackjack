@@ -35,10 +35,10 @@ func main() {
 
 		game.Start()
 
-		for game.Player.Score < 21 {
+		for game.Player.Score < 21 || input == "double" {
 
 			fmt.Println("What would you like to do?")
-			fmt.Println("Type 'hit' to draw a card, 'stand' to hold, or 'quit' to exit the game.")
+			fmt.Println("Type 'hit' to draw a card, 'double' to draw one card for double the bet, 'stand' to hold, or 'quit' to exit the game.")
 
 			scanner.Scan()
 			input = strings.ToLower(scanner.Text())
@@ -58,6 +58,17 @@ func main() {
 				fmt.Printf("Dealer shows %s of %s: %d: \n", game.Dealer.Hand[1].Rank, game.Dealer.Hand[1].Suit, game.Dealer.Score)
 				game.Dealer.DealerDraws(game.Deck)
 				game.DetermineWinner(betAmount)
+				goto NextRound
+			case "double":
+				if betAmount*2 > game.Player.Tokens {
+					fmt.Println("Cannot double down, not enough tokens")
+					continue
+				}
+				fmt.Println("You chose to 'double down' — ending your turn.")
+				game.Player.AddCard(game.Deck.DealCard())
+				fmt.Printf("Player drew %s of %s \n\n", game.Player.Hand[len(game.Player.Hand)-1].Rank, game.Player.Hand[len(game.Player.Hand)-1].Suit)
+				fmt.Printf("Player score %d \n\n", game.Player.Score)
+				game.DetermineWinner(betAmount * 2)
 				goto NextRound
 			case "quit":
 				fmt.Println("Exiting the game...")
