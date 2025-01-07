@@ -1,6 +1,7 @@
 package player
 
 import (
+	"errors"
 	"go-blackjack/card"
 	"log"
 	"os"
@@ -72,4 +73,29 @@ func (p *Player) UpdateTokens(betAmount int, outcome bool) error {
 	}
 
 	return nil
+}
+
+func (p *Player) SplitHand() ([]*Player, error) {
+	if len(p.Hand) != 2 {
+		return nil, errors.New("split is only possible with exactly two cards in hand")
+	}
+
+	if p.Hand[0].Rank != p.Hand[1].Rank {
+		return nil, errors.New("both cards must have the same rank to split")
+	}
+
+	player1 := &Player{
+		Name:   p.Name,
+		Hand:   []*card.Card{p.Hand[0]},
+		Tokens: p.Tokens,
+	}
+
+	player2 := &Player{
+		Name:   p.Name,
+		Hand:   []*card.Card{p.Hand[1]},
+		Tokens: p.Tokens,
+	}
+
+	p.Hand = nil
+	return []*Player{player1, player2}, nil
 }
