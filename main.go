@@ -61,7 +61,6 @@ func main() {
 				game.Player.AddCard(game.Deck.DealCard())
 				fmt.Printf("🃏 You drew the %s of %s!\n", game.Player.Hand[len(game.Player.Hand)-1].Rank, game.Player.Hand[len(game.Player.Hand)-1].Suit)
 				fmt.Printf("🔥 Your score: %d\n\n", game.Player.Score)
-				game.Dealer.DealerDraws(game.Deck)
 				if game.Player.Score > 21 {
 					game.DetermineWinner(betAmount)
 					goto NextRound
@@ -99,6 +98,7 @@ func main() {
 		var playAgain bool
 		if game.Player.Tokens == 0 {
 			playAgain = false
+			fmt.Println("No Money left.")
 		} else {
 			huh.NewConfirm().
 				Title("Do you want to play another round?").
